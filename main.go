@@ -146,7 +146,11 @@ func doSearch(current_search Search) {
 			continue
 		}
 
-		var t_json = doRequest( config.tokens[token_index].datoken, current_search, page )
+		var url = fmt.Sprintf("https://gitlab.com/api/v4/search?scope=%s&search=%s&order_by=%s&sort=%s&page=%d&per_page=100", current_search.scope, current_search.keyword, current_search.order_by, current_search.sort, page )
+		// var url = fmt.Sprintf("https://gitlab.com/api/v4/search?scope=blobs&search=%s&order_by=%s&sort=%s&page=%d", current_search.keyword, current_search.order_by, current_search.sort, page )
+		PrintInfos( "debug", url )
+
+		var t_json = doRequest( config.tokens[token_index].datoken, url )
 		var n_results = len(t_json)
 
 		if n_results <= 0 {
@@ -162,17 +166,13 @@ func doSearch(current_search Search) {
 }
 
 
-func doRequest(token string, current_search Search, page int) []map[string]interface {} {
+func doRequest(token string, url string) []map[string]interface {} {
 
 	defer func() {
         if r := recover(); r != nil {
             // fmt.Println("Recovered in f", r)
         }
     }()
-
-	var url = fmt.Sprintf("https://gitlab.com/api/v4/search?scope=%s&search=%s&order_by=%s&sort=%s&page=%d", current_search.scope, current_search.keyword, current_search.order_by, current_search.sort, page )
-	// var url = fmt.Sprintf("https://gitlab.com/api/v4/search?scope=blobs&search=%s&order_by=%s&sort=%s&page=%d", current_search.keyword, current_search.order_by, current_search.sort, page )
-	PrintInfos( "debug", url )
 
 	client := http.Client{ Timeout: time.Second * 5 }
 
@@ -261,6 +261,21 @@ func cleanSubdomain(sub []byte) string {
 }
 
 
+// func getGroups() []int {
+// 	var t_groups []int
+
+// 	for token := range config.tokens {
+
+// 		var url = fmt.Sprintf("https://gitlab.com/api/v4/groups", current_search.scope, current_search.keyword, current_search.order_by, current_search.sort, page )
+// 		PrintInfos( "debug", url )
+
+// 		t_groups = append( t_groups, 1 )
+// 	}
+
+// 	return t_groups
+// }
+
+
 func main() {
 
 	var token string
@@ -332,6 +347,7 @@ func main() {
 
 	displayConfig()
 
+
 	// https://docs.gitlab.com/ee/api/search.html
 	// Allowed values are created_at only. If not set, results are sorted by created_at in descending order for basic search, or by the most relevant documents for Advanced Search.
 	var order_by = "created_at"
@@ -346,6 +362,10 @@ func main() {
 		doSearch( current_search )
 		n_search++
 	}
+
+	// var t_groups []int
+	// t_groups = getGroups()
+
 
 	PrintInfos( "", fmt.Sprintf("%d searches performed",n_search) )
 	PrintInfos( "", fmt.Sprintf("%d subdomains found",len(t_subdomains)) )
