@@ -261,21 +261,6 @@ func cleanSubdomain(sub []byte) string {
 }
 
 
-// func getGroups() []int {
-// 	var t_groups []int
-
-// 	for token := range config.tokens {
-
-// 		var url = fmt.Sprintf("https://gitlab.com/api/v4/groups", current_search.scope, current_search.keyword, current_search.order_by, current_search.sort, page )
-// 		PrintInfos( "debug", url )
-
-// 		t_groups = append( t_groups, 1 )
-// 	}
-
-// 	return t_groups
-// }
-
-
 func main() {
 
 	var token string
@@ -363,9 +348,6 @@ func main() {
 		n_search++
 	}
 
-	// var t_groups []int
-	// t_groups = getGroups()
-
 
 	PrintInfos( "", fmt.Sprintf("%d searches performed",n_search) )
 	PrintInfos( "", fmt.Sprintf("%d subdomains found",len(t_subdomains)) )
@@ -393,7 +375,6 @@ func inArrayKey(str string, array map[string]interface {}) bool {
 func performRegexp(code string, rgxp *regexp.Regexp ) [][]byte {
 	return rgxp.FindAll([]byte(code), -1)
 }
-
 
 
 func resliceTokens(s []Token, index int) []Token {
@@ -429,6 +410,7 @@ func PrintInfos(infos_type string, str string) {
 		}
 	}
 }
+
 
 func banner() {
 	fmt.Print("\n")
