@@ -53,7 +53,7 @@ var config = Config{}
 var t_subdomains []string
 var t_search []Search
 // var t_scopes = []string{"projects","issues","merge_requests","milestones","snippet_titles","users","blobs","commits","notes","wiki_blobs"}
-var t_scopes = []string{"blobs"}
+// var t_scopes = []string{"blobs"}
 // var t_search_fields = []string{"description"}
 
 
