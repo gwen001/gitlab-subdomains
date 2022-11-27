@@ -269,7 +269,7 @@ func main() {
 	flag.StringVar( &config.domain, "d", "", "domain you are looking for (required)" )
 	flag.BoolVar( &config.extend, "e", false, "extended mode, also look for <dummy>example.com" )
 	flag.BoolVar( &config.debug, "debug", false, "debug mode" )
-	flag.StringVar( &token, "t", "", "gitlab token (required), can be:\n  • a single token\n  • a list of tokens separated by comma\n  • a file containing 1 token per line\nif the options is not provided, the environment variable GITLAB_TOKEN is readed, it can be:\n  • a single token\n  • a list of tokens separated by comma" )
+	flag.StringVar( &token, "t", "", "gitlab token (required), can be:\n  • a single token\n  • a list of tokens separated by comma\n  • a file (.tokens) containing 1 token per line\nif the options is not provided, the environment variable GITLAB_TOKEN is readed, it can be:\n  • a single token\n  • a list of tokens separated by comma" )
 	flag.Parse()
 
 	if config.domain == "" {

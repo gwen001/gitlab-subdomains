@@ -54,7 +54,7 @@ Usage of gitlab-subdomains:
     	gitlab token (required), can be:
     	  • a single token
     	  • a list of tokens separated by comma
-    	  • a file containing 1 token per line
+    	  • a file (.tokens) containing 1 token per line
     	if the options is not provided, the environment variable GITLAB_TOKEN is readed, it can be:
     	  • a single token
     	  • a list of tokens separated by comma
