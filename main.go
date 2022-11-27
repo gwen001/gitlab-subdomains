@@ -25,6 +25,7 @@ type Token struct {
 
 type Search struct {
 	signature string
+	token string
 	domain string
 	scope string
 	keyword string
@@ -117,7 +118,8 @@ func getNextToken( token_index int, n_token int ) int {
 
 func doSearch(current_search Search) {
 
-	PrintInfos( "debug", fmt.Sprintf("domain:%s, scope:%s, keyword:%s, order_by:%s, sort:%s", current_search.domain, current_search.scope, current_search.keyword, current_search.order_by, current_search.sort) )
+	PrintInfos( "debug", fmt.Sprintf("token:%s, domain:%s, scope:%s, keyword:%s, order_by:%s, sort:%s", current_search.token, current_search.domain, current_search.scope, current_search.keyword, current_search.order_by, current_search.sort) )
+	// PrintInfos( "debug", fmt.Sprintf("domain:%s, scope:%s, keyword:%s, order_by:%s, sort:%s", current_search.domain, current_search.scope, current_search.keyword, current_search.order_by, current_search.sort) )
 
 	var page = 1
 	var token_index = -1
@@ -141,11 +143,12 @@ func doSearch(current_search Search) {
 			continue
 		}
 
-		var url = fmt.Sprintf("https://%s/api/v4/search?scope=%s&search=%s&order_by=%s&sort=%s&page=%d&per_page=100", current_search.domain, current_search.scope, current_search.keyword, current_search.order_by, current_search.sort, page )
+		var url = fmt.Sprintf("https://%s/api/v4/search?scope=%s&search=%s&order_by=%s&sort=%s&page=%d&per_page=200", current_search.domain, current_search.scope, current_search.keyword, current_search.order_by, current_search.sort, page )
 		// var url = fmt.Sprintf("https://gitlab.com/api/v4/search?scope=blobs&search=%s&order_by=%s&sort=%s&page=%d", current_search.keyword, current_search.order_by, current_search.sort, page )
 		PrintInfos( "debug", url )
 
-		var t_json = doRequest( current_search.domain, config.tokens[token_index].datoken, url )
+		var t_json = doRequest( current_search.domain, current_search.token, url )
+		// var t_json = doRequest( current_search.domain, config.tokens[token_index].datoken, url )
 		var n_results = len(t_json)
 
 		if n_results <= 0 {
@@ -173,7 +176,7 @@ func doRequest(domain string, token string, url string) []map[string]interface {
         TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
     }
 
-	client := http.Client{ Timeout: time.Second * 5, Transport: tr }
+	client := http.Client{ Timeout: time.Second * 10, Transport: tr }
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -354,18 +357,23 @@ func main() {
 	var skip = false
 
 	if !skip {
-		for _,scope := range t_scopes {
-			wg.Add(1)
-			go func(scope string) {
-				defer wg.Done()
-				max_procs<-true
-				var current_search = Search{domain:"gitlab.com", scope:scope, keyword:config.search, order_by:order_by, sort:sort}
-				doSearch( current_search )
-				<-max_procs
-			}(scope)
+		for _,token := range config.tokens {
+			for _,scope := range t_scopes {
+				wg.Add(1)
+				go func(scope string) {
+					defer wg.Done()
+					max_procs<-true
+					var current_search = Search{domain:"gitlab.com", token:token.datoken, scope:scope, keyword:config.search, order_by:order_by, sort:sort}
+					doSearch( current_search )
+					<-max_procs
+				}(scope)
+			}
+			wg.Wait()
 		}
-		wg.Wait()
 	}
+
+
+
 
 	PrintInfos( "", fmt.Sprintf("%d searches performed",n_search) )
 	PrintInfos( "", fmt.Sprintf("%d subdomains found",len(t_subdomains)) )
