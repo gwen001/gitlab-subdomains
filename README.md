@@ -18,7 +18,7 @@
 
 ## Important note
 
-‼ GitLab search is are very limited ‼
+‼ GitLab search is very limited ‼
 Check the [official doc](https://docs.gitlab.com/ee/api/search.html) for more information.
 
 ## Requirements
