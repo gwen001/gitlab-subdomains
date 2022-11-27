@@ -16,6 +16,15 @@
 
 ---
 
+## Important note
+
+‼ GitLab are very limited ‼
+Check the [official doc](https://docs.gitlab.com/ee/api/search.html) for more information.
+
+## Requirements
+
+You need a GitLab token, if you don't have you can easily create a free account on [gitlab.com](https://gitlab.com/) or use my [github-regexp](https://github.com/gwen001/github-regexp) to find one or more...
+
 ## Install
 
 ```
