@@ -76,7 +76,7 @@ You can disable that feature by using the option `-k`.
 
 ---
 
-<img src="https://github.com/gwen001/gitlab-subdomains/raw/main/preview.gif">
+<img src="https://raw.githubusercontent.com/gwen001/gitlab-subdomains/master/preview.gif">
 
 ---
 
