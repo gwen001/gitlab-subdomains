@@ -415,19 +415,17 @@ func main() {
 	var skip = false
 
 	if !skip {
-		for _,token := range config.tokens {
-			for _,scope := range t_scopes {
-				wg.Add(1)
-				go func(scope string) {
-					defer wg.Done()
-					max_procs<-true
-					var current_search = Search{domain:"gitlab.com", token:token.datoken, scope:scope, keyword:config.search, order_by:order_by, sort:sort}
-					doSearch( current_search )
-					<-max_procs
-				}(scope)
-			}
-			wg.Wait()
+		for _,scope := range t_scopes {
+			wg.Add(1)
+			go func(scope string) {
+				defer wg.Done()
+				max_procs<-true
+				var current_search = Search{domain:"gitlab.com", token:token.datoken, scope:scope, keyword:config.search, order_by:order_by, sort:sort}
+				doSearch( current_search )
+				<-max_procs
+			}(scope)
 		}
+		wg.Wait()
 	}
 
 
