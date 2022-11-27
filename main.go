@@ -52,7 +52,7 @@ var au = aurora.NewAurora(true)
 var config = Config{}
 var t_subdomains []string
 var t_search []Search
-// var t_scopes = []string{"projects","issues","merge_requests","milestones","snippet_titles","users","blobs","commits","notes","wiki_blobs"}
+var t_scopes = []string{"projects","issues","merge_requests","milestones","snippet_titles","users","blobs","commits","notes","wiki_blobs"}
 // var t_scopes = []string{"blobs"}
 // var t_search_fields = []string{"description"}
 
@@ -118,7 +118,7 @@ func getNextToken( token_index int, n_token int ) int {
 
 func doSearch(current_search Search) {
 
-	PrintInfos( "debug", fmt.Sprintf("token:%s, domain:%s, scope:%s, keyword:%s, order_by:%s, sort:%s", current_search.token, current_search.domain, current_search.scope, current_search.keyword, current_search.order_by, current_search.sort) )
+	PrintInfos( "debug", fmt.Sprintf("domain:%s, scope:%s, keyword:%s, order_by:%s, sort:%s", current_search.domain, current_search.scope, current_search.keyword, current_search.order_by, current_search.sort) )
 	// PrintInfos( "debug", fmt.Sprintf("domain:%s, scope:%s, keyword:%s, order_by:%s, sort:%s", current_search.domain, current_search.scope, current_search.keyword, current_search.order_by, current_search.sort) )
 
 	var page = 1
@@ -147,8 +147,7 @@ func doSearch(current_search Search) {
 		// var url = fmt.Sprintf("https://gitlab.com/api/v4/search?scope=blobs&search=%s&order_by=%s&sort=%s&page=%d", current_search.keyword, current_search.order_by, current_search.sort, page )
 		PrintInfos( "debug", url )
 
-		var t_json = doRequest( current_search.domain, current_search.token, url )
-		// var t_json = doRequest( current_search.domain, config.tokens[token_index].datoken, url )
+		var t_json = doRequest( current_search.domain, config.tokens[token_index].datoken, url )
 		var n_results = len(t_json)
 
 		if n_results <= 0 {
@@ -420,7 +419,7 @@ func main() {
 			go func(scope string) {
 				defer wg.Done()
 				max_procs<-true
-				var current_search = Search{domain:"gitlab.com", token:token.datoken, scope:scope, keyword:config.search, order_by:order_by, sort:sort}
+				var current_search = Search{domain:"gitlab.com", scope:scope, keyword:config.search, order_by:order_by, sort:sort}
 				doSearch( current_search )
 				<-max_procs
 			}(scope)
