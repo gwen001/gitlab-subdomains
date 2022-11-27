@@ -52,8 +52,8 @@ var au = aurora.NewAurora(true)
 var config = Config{}
 var t_subdomains []string
 var t_search []Search
-var t_scopes = []string{"projects","issues","merge_requests","milestones","snippet_titles","users","blobs","commits","notes","wiki_blobs"}
-// var t_scopes = []string{"issues"}
+// var t_scopes = []string{"projects","issues","merge_requests","milestones","snippet_titles","users","blobs","commits","notes","wiki_blobs"}
+var t_scopes = []string{"blobs"}
 // var t_search_fields = []string{"description"}
 
 
@@ -156,7 +156,7 @@ func doSearch(current_search Search) {
 			break
 		}
 
-		doRegexp( t_json )
+		doRegexp( current_search.scope, t_json )
 
 		page++
 		// run = false
@@ -220,11 +220,17 @@ func doRequest(domain string, token string, url string) []map[string]interface {
 }
 
 
-func doRegexp(t_json []map[string]interface {}) {
+func doRegexp(scope string, t_json []map[string]interface {}) {
 
 	var t_match [][]byte
 
 	for _,t_item := range t_json {
+		// var t_item2 = mytoArray(t_item)
+
+		// for key,value := range t_item2 {
+		// 	fmt.Printf("%s %s\n",key,value)
+		// }
+
 		for _,value := range t_item {
 
 			t_match = performRegexp( fmt.Sprintf("%s",value), config.DomainRegexp )
@@ -234,8 +240,9 @@ func doRegexp(t_json []map[string]interface {}) {
 					var str_match = cleanSubdomain( match )
 					if !inArray(str_match,t_subdomains) {
 						t_subdomains = append( t_subdomains, str_match )
-						if inArrayKey("web_url",t_item) {
-							PrintInfos( "info", fmt.Sprintf("%s",t_item["web_url"]) )
+						var url = buildUrl(scope, t_item)
+						if len(url) > 0 {
+							PrintInfos( "info", buildUrl(scope, t_item) )
 						}
 						PrintInfos( "found", str_match )
 						config.fpOutput.WriteString(str_match+"\n")
@@ -247,6 +254,57 @@ func doRegexp(t_json []map[string]interface {}) {
 	}
 }
 
+
+func buildUrl(scope string, t_item map[string]interface {}) string {
+	var url = ""
+
+	if scope == "projects" {
+		return fmt.Sprintf("%s",t_item["web_url"])
+	}
+
+	if scope == "issues" {
+		return fmt.Sprintf("%s",t_item["web_url"])
+	}
+
+	if scope == "merge_requests" {
+		return fmt.Sprintf("%s",t_item["web_url"])
+	}
+
+	if scope == "milestones" {
+		return fmt.Sprintf("%s",t_item["web_url"])
+	}
+
+	if scope == "snippet_titles" {
+		return fmt.Sprintf("%s",t_item["web_url"])
+	}
+
+	if scope == "users" {
+		return fmt.Sprintf("%s",t_item["web_url"])
+	}
+
+	if scope == "blobs" {
+		var path = strings.Replace( fmt.Sprint(t_item["path"]), "/", "%2f", -1 )
+		var project_id,_ = t_item["project_id"]
+		var ref,_ = t_item["ref"]
+		return fmt.Sprintf("https://gitlab.com/api/v4/projects/%.0f/repository/files/%s/raw?ref=%s",project_id,path,ref)
+	}
+
+	if scope == "commits" {
+		return fmt.Sprintf("%s",t_item["web_url"])
+	}
+
+	if scope == "notes" {
+		return ""
+		return "notes"
+	}
+
+	if scope == "wiki_blobs" {
+		return ""
+		return "wiki_blobs"
+	}
+
+	return url
+}
 
 func cleanSubdomain(sub []byte) string {
 	var clean_sub = string(sub)
