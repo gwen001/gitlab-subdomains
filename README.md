@@ -16,6 +16,10 @@
 
 ---
 
+## Description
+
+This Go tool performs searches on GitLab and parses the results to find subdomains of a given domain.
+
 ## Important note
 
 ‼ GitLab search is very limited ‼
