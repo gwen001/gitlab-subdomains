@@ -50,18 +50,26 @@ $ gitlab-subdomains -h
 
 Usage of gitlab-subdomains:
   -d string
-    	domain you are looking for (required)
+        domain you are looking for (required)
   -debug
-    	debug mode
-  -e	extended mode, also look for <dummy>example.<tld>
+        debug mode
+  -e    extended mode, also look for <dummy>example.com
+  -o string
+        output file name
   -t string
-    	gitlab token (required), can be:
-    	  • a single token
-    	  • a list of tokens separated by comma
-    	  • a file (.tokens) containing 1 token per line
-    	if the options is not provided, the environment variable GITLAB_TOKEN is readed, it can be:
-    	  • a single token
-    	  • a list of tokens separated by comma
+        gitlab token (required), can be:
+          • a single token
+          • a list of tokens separated by comma
+          • a file (.tokens) containing 1 token per line
+        if the options is not provided, the environment variable GITLAB_TOKEN is readed, it can be:
+          • a single token
+          • a list of tokens separated by comma
+```
+```bash
+gitlab-subdomains -d hackerone.com -t "*****-i*-*************4***" -o subdomains.txt
+```
+```bash
+gitlab-subdomains -d hackerone.com -t "*****-i*-*************4***" | (tee/anew) subdomains.txt
 ```
 
 If you want to use multiple tokens, you better create a `.tokens` file in the executable directory with 1 token per line  

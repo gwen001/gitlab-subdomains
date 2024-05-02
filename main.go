@@ -323,13 +323,15 @@ func cleanSubdomain(sub []byte) string {
 
 
 func main() {
-
+	banner()
 	var token string
+	var outputFileName string
 
 	flag.StringVar( &config.domain, "d", "", "domain you are looking for (required)" )
 	flag.BoolVar( &config.extend, "e", false, "extended mode, also look for <dummy>example.com" )
 	flag.BoolVar( &config.debug, "debug", false, "debug mode" )
 	flag.StringVar( &token, "t", "", "gitlab token (required), can be:\n  • a single token\n  • a list of tokens separated by comma\n  • a file (.tokens) containing 1 token per line\nif the options is not provided, the environment variable GITLAB_TOKEN is readed, it can be:\n  • a single token\n  • a list of tokens separated by comma" )
+	flag.StringVar(&outputFileName, "o", "", "output file name")
 	flag.Parse()
 
 	if config.domain == "" {
@@ -338,17 +340,17 @@ func main() {
 		os.Exit(-1)
 	}
 
-	dir, _ := os.Getwd()
-	config.output = dir + "/" + config.domain + ".txt"
-
-	fp, outErr := os.Create( config.output )
-	if outErr != nil {
-		fmt.Println(outErr)
-		os.Exit(-1)
+	var fp *os.File
+	if outputFileName != "" {
+		var err error
+		fp, err = os.Create(outputFileName)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(-1)
+		}
+		defer fp.Close()
+		config.fpOutput = fp // Assign the file pointer to config.fpOutput
 	}
-
-	config.fpOutput = fp
-	// defer fp.Close()
 
 	u, _ := tld.Parse("http://"+config.domain)
 	// fmt.Println(u.Domain)
@@ -377,10 +379,6 @@ func main() {
 	config.search = "%22" + strings.ReplaceAll(url.QueryEscape(config.search), "-", "%2D") + "%22"
 
 	parseToken( token )
-
-	if config.debug {
-		banner()
-	}
 
 	var n_token = len(config.tokens)
 	if n_token == 0 {
@@ -443,6 +441,8 @@ func inArray(str string, array []string) bool {
 	}
 	return false
 }
+
+
 func inArrayKey(str string, array map[string]interface {}) bool {
 	for i,_ := range array {
 		if i == str {
@@ -494,6 +494,7 @@ func PrintInfos(infos_type string, str string) {
 
 
 func banner() {
+	if !isOutputRedirectedToFile(){
 	fmt.Print("\n")
 	fmt.Print(`
   	   ▗▐  ▜    ▌          ▌    ▌          ▗
@@ -501,5 +502,13 @@ func banner() {
 	▚▄▌▐▐ ▖▐ ▞▀▌▌ ▌  ▝▀▖▌ ▌▌ ▌▌ ▌▌ ▌▌▐ ▌▞▀▌▐ ▌ ▌▝▀▖
 	▗▄▘▀▘▀  ▘▝▀▘▀▀   ▀▀ ▝▀▘▀▀ ▝▀▘▝▀ ▘▝ ▘▝▀▘▀▘▘ ▘▀▀
 	`)
-	fmt.Print("       by @gwendallecoguic                          \n\n")
+	fmt.Print("       by @gwendallecoguic                         \n\n")
+}}
+
+func isOutputRedirectedToFile() bool {
+	fileInfo, err := os.Stdout.Stat()
+	if err != nil {
+		return false
+	}
+	return (fileInfo.Mode() & os.ModeCharDevice) == 0
 }
